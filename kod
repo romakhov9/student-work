@@ -1,0 +1,279 @@
+from tkinter import 
+
+root = Tk()
+root.title(Интерфейс)
+root.geometry(900x900)
+root.configure(bg='#A8D4FF')
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import matplotlib.pyplot as plt
+import xlrd2
+
+#функция выводит количество уязвимостей по классам
+workbook = xlrd2.open_workbook('vullist.xlsx')
+sheet = workbook.sheet_by_index(0)
+row = sheet.nrows
+print(' ', 'Всего записей', row)
+names = sheet.col_values(4)
+danger_lavels = sheet.col_values(12)
+year_distribution = dict()
+danger_super, danger_hight, danger_middle, danger_low = 0, 0, 0, 0
+for i in range(3, row)
+  if names[i].find('iOS') = 0
+    if danger_lavels[i][0] == 'К'
+      danger_super += 1
+    elif danger_lavels[i][0] == 'В'
+      danger_hight += 1
+    elif danger_lavels[i][0] == 'С'
+      danger_middle += 1
+    else
+      danger_low += 1
+
+print('Количество уязвимостей по уровням опасности ')
+print('', 'Низкий', danger_low)
+print('  ', 'Средний', danger_middle)
+print('   ', 'Высокий', danger_hight)
+print('    ', 'Критический', danger_super)
+
+#вывод виджетов
+button_ok = Button(root, text='Ok', bg='white', fg='green', width=20, height=1)
+button_write = Button(root, text='Write', bg='white', fg='green', width=20)
+label_super = Label(root,
+                    text='Критический',
+                    bg='white',
+                    fg='green',
+                    width=22,
+                    height=2)
+label_super_num = Label(root,
+                        text='0',
+                        bg='white',
+                        fg='green',
+                        width=22,
+                        height=2)
+label_hight = Label(root,
+                    text='Высокий',
+                    bg='white',
+                    fg='green',
+                    width=22,
+                    height=2)
+label_hight_num = Label(root,
+                        text='0',
+                        bg='white',
+                        fg='green',
+                        width=22,
+                        height=2)
+label_middle = Label(root,
+                     text='Средний',
+                     bg='white',
+                     fg='green',
+                     width=22,
+                     height=2)
+label_middle_num = Label(root,
+                         text='0',
+                         bg='white',
+                         fg='green',
+                         width=22,
+                         height=2)
+label_low = Label(root,
+                  text='Низкий',
+                  bg='white',
+                  fg='green',
+                  width=22,
+                  height=2)
+label_low_num = Label(root,
+                      text='0',
+                      bg='white',
+                      fg='green',
+                      width=22,
+                      height=2)
+
+#функция виджета Ok
+button_ok.place(x=100, y=500)
+
+
+def Ok(event)
+  label_super_num['text'] = str(danger_super)
+  label_hight_num['text'] = str(danger_hight)
+  label_middle_num['text'] = str(danger_middle)
+  label_low_num['text'] = str(danger_low)
+
+
+#функция виджета Write
+def write(event)
+  from docx import Document
+  document = Document()
+  document.add_heading('Таблица уязвимостей', 0)
+  table = document.add_table(rows=4, cols=3)
+  hdr_cells = table.rows[0].cells
+  hdr_cells[0].text = '1'
+  hdr_cells[1].text = 'Низкий'
+  hdr_cells[2].text = str(danger_low)
+  hdr_cells1 = table.rows[1].cells
+  hdr_cells1[0].text = '2'
+  hdr_cells1[1].text = 'Средний'
+  hdr_cells1[2].text = str(danger_middle)
+  hdr_cells2 = table.rows[2].cells
+  hdr_cells2[0].text = '3'
+  hdr_cells2[1].text = 'Высокий'
+  hdr_cells2[2].text = str(danger_hight)
+  hdr_cells3 = table.rows[3].cells
+  hdr_cells3[0].text = '4'
+  hdr_cells3[1].text = 'Критический'
+  hdr_cells3[2].text = str(danger_super)
+  document.save('test.docx')
+
+
+button_ok.bind('Button-1', Ok)
+button_write.bind('Button-1', write)
+
+
+#функция выводит диаграмму
+def diagramma(event)
+  try
+    if danger_low == 0 and danger_middle == 0 and danger_hight == 0 and danger_super == 0
+      messagebox.showerror(
+        'Ошибка',
+        'Для вывода диаграммы необходимо хотя бы одно значение отличное от 0!')
+    else
+      labels = 'Низкий', 'Средний', 'Высокий', 'Критический'
+      sizes = [danger_low, danger_middle, danger_hight, danger_super]
+
+      colors = (grey, 'yellow', 'green', brown)
+      fig1, ax1 = plt.subplots()
+      explode = (0, 0, 0, 0)
+
+      ax1.pie(sizes,
+              wedgeprops=dict(width=0.7),
+              colors=colors,
+              explode=explode,
+              labels=labels,
+              autopct='%1.1f%%',
+              shadow=True,
+              startangle=90)
+      patches, texts, auto = ax1.pie(sizes,
+                                     wedgeprops=dict(width=0.5),
+                                     colors=colors,
+                                     shadow=True,
+                                     startangle=90,
+                                     explode=explode,
+                                     autopct='%1.1f%%')
+
+      plt.legend(patches, labels, loc=lower center)
+      okno = Tk()
+      okno.title(Диаграмма уязвимостей)
+      root.configure(bg='#A8D4FF')
+      canvas = FigureCanvasTkAgg(fig1, master=okno)
+      canvas.get_tk_widget().pack()
+      canvas.draw()
+  except NameError
+    messagebox.showerror('Ошибка',
+                         'Для вывода диаграммы необходимо провести анализ!')
+
+
+buttonDiagram = Button(root,
+                       bg='white',
+                       font='Times 12',
+                       fg='green',
+                       text=Вывести диаграмму,
+                       height=2)
+buttonDiagram.place(x=350, y=330)
+buttonDiagram.bind('Button-1', diagramma)
+
+
+#функция очищяет лейблы и поля
+def Clear(event)
+  label_low_num['text'] = 0
+  label_middle_num['text'] = 0
+  label_hight_num['text'] = 0
+  label_super_num['text'] = 0
+
+
+buttonClear = Button(root,
+                     bg='white',
+                     font='Times 12',
+                     fg='green',
+                     text=Очистить поля,
+                     width=13,
+                     height=2)
+buttonClear.place(x=375, y=380)
+buttonClear.bind('Button-1', Clear)
+
+#функция выводит информацию об устранении уязвимостей
+row = sheet.nrows
+ystranenie = sheet.col_values(16)
+ystranena, neystranena = 0, 0
+for i in range(3, row)
+  if names[i].find('iOS') = 0
+    if ystranenie[i][0] == 'У'
+      ystranena += 1
+    elif ystranenie[i][0] == 'И'
+      neystranena += 1
+print('')
+print('Информация об устранении ', 'уязвимостей устранено', ystranena)
+print('                          ', 'информация об устранении отсутствует',
+      neystranena)
+
+#функция классифицирует уязвимости
+yizvimosti = sheet.col_values(8)
+arhitektyra, kod, mnogofakt = 0, 0, 0
+for i in range(3, row)
+  if names[i].find('iOS') = 0
+    if yizvimosti[i][11] == 'а'
+      arhitektyra += 1
+    elif yizvimosti[i][11] == 'к'
+      kod += 1
+    else
+      mnogofakt += 1
+
+print('')
+print('Класс уязвимостей ', 'уязвимостей архитектуры', arhitektyra)
+print('                   ', 'уязвимостей кода', kod)
+print('                   ', 'многофакторных уязвимостей ', mnogofakt)
+
+#функция выводит статусы уязвимостей
+status = sheet.col_values(14)
+vhode, proizvod, yazvim = 0, 0, 0
+for i in range(3, row)
+  if names[i].find('iOS') = 0
+    if status[i][13] == 'в'
+      vhode += 1
+    elif status[i][13] == 'п'
+      proizvod += 1
+    else
+      yazvim += 1
+
+print('')
+print('Статус уязвимости ', 'подвтерждена в ходе исследования', vhode)
+print('                   ', 'подтверждена производителем', proizvod)
+print('                   ', 'потенциальная уязвимость ', yazvim)
+
+#функция выводит наличие эксплойта
+ixploit = sheet.col_values(15)
+dannie, prosto_syshestv, syshestvyet_v = 0, 0, 0
+for i in range(3, row)
+  if names[i].find('iOS') = 0
+    if ixploit[i][0] == 'С'
+      prosto_syshestv += 1
+    elif ixploit[i][13] == 'о'
+      syshestvyet_v += 1
+    elif ixploit[i][0] == 'Д'
+      dannie += 1
+
+print('')
+print('Наличие эксплойта ', 'существует', prosto_syshestv)
+print('                   ', 'существует в открытом доступе', syshestvyet_v)
+print('                   ', 'данные уточняются ', dannie)
+
+label_super.pack()
+label_super_num.pack()
+label_hight.pack()
+label_hight_num.pack()
+label_middle.pack()
+label_middle_num.pack()
+label_low.pack()
+
+label_low_num.pack()
+
+button_ok.pack()
+button_write.pack()
+
+root.mainloop()
