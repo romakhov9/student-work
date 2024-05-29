@@ -1,0 +1,79 @@
+import csv
+
+with open('dev.csv', newline='') as csvfile:
+    reader = csv.reader(csvfile, delimiter=';')
+    countries_count = {}
+    for row in list(reader)[1:]:
+        country = row[2]
+        if country in countries_count:
+            countries_count[country] += 1
+        else:
+            countries_count[country] = 1
+    most_common_country = max(countries_count, key=lambda k: countries_count[k])
+    print('Страна с самым большим количеством разработчиков:', most_common_country, '\n')
+
+with open('games1.csv', newline='') as csvfile:
+    reader = csv.reader(csvfile, delimiter=';')
+    second_column = []
+    max_date = 0
+    min_date = 2100
+    for row in list(reader)[1:]:
+      release = row[3]
+      if int(release) > int(max_date):
+        max_date = release
+      if int(release) < int(min_date):
+        min_date = release
+
+    print('Год релиза самой старой игры:', min_date,'\n')
+    print('Год релиза самой новой игры:', max_date,'\n')
+
+
+with open('online.csv', newline='') as csvfile:
+    reader = csv.reader(csvfile, delimiter=';')
+    total_sum = 0
+    max_online = 0
+    name = ''
+    for row in list(reader)[1:]:
+        if int(row[4]) >= int(max_online):
+          max_online = row[4]
+          name = row[1]
+    print('Игра с самым большим онлайном за все время:', name, 'в количестве', max_online, 'человек\n')
+
+game_name = "Euro Truck Simulator 2"
+max_discount = 0
+discount_date = ''
+with open('price.csv', newline='') as csvfile:
+    reader = csv.reader(csvfile, delimiter=';')
+    for row in list(reader)[1:]:
+        if row[1] == game_name:
+            if int(row[43]) > max_discount:
+                max_discount = int(row[43])
+                discount_date = row[44]
+
+print('Максимальная скидка для игры', game_name, 'составляет', max_discount, '% и была применена', discount_date, '\n')
+
+game_name = "Starfield"
+region_prices = []
+names = []
+with open('price.csv', newline='') as csvfile:
+    reader = csv.reader(csvfile, delimiter=';')
+    for row in reader:
+        if row[1] == game_name:
+          region_prices.extend([int(price) for price in row[2:-3]])
+
+          sortprice = sorted(region_prices)     
+        if row[1] == 'Игра':
+          names.extend(row[2:-3])
+
+zipvalue = zip(region_prices, names)
+ziplist = list(zipvalue)
+
+print('Топ-5 регионов для покупки игры',game_name, ':\n')
+sorted_ziplist = sorted(ziplist)
+for i in range(5):
+    if sorted_ziplist[i][0] == 0:
+        print('Not Available in Russia')
+        print(f' {sorted_ziplist[i+1]} \n {sorted_ziplist[i+2]} \n {sorted_ziplist[i+3]} \n {sorted_ziplist[i+4]} \n {sorted_ziplist[i+5]}')
+        break
+    else:
+        print(sorted_ziplist[i])
